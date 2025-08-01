@@ -4,13 +4,15 @@ for (let i = 0; i <= 7200; i += 300) {
 }
 
 function generateGT2RSValues() {
-  return labels.map((rpm) => {
-    if (rpm < 2500) return 150;
-    if (rpm < 4000) return 300 + (rpm - 2500) * 0.28;
-    if (rpm <= 6700) return 700;
-    if (rpm > 6700) return Math.max(0, 700 - (rpm - 6700) * 0.4);
-    return 0;
-  }).map((v) => Math.round(v));
+  return labels
+    .map((rpm) => {
+      if (rpm < 2500) return 150;
+      if (rpm < 4000) return 300 + (rpm - 2500) * 0.28;
+      if (rpm <= 6700) return 700;
+      if (rpm > 6700) return Math.max(0, 700 - (rpm - 6700) * 0.4);
+      return 0;
+    })
+    .map((v) => Math.round(v));
 }
 
 let values = generateGT2RSValues();
@@ -48,7 +50,8 @@ function updateValue(index, val, fromSlider) {
   Courbes.data.datasets[0].data = values;
   Courbes.data.datasets[1].data = valuesKW;
   Courbes.options.scales.y.suggestedMax = Math.max(...values) * 1.1;
-  Courbes.options.scales.y1.max = Courbes.options.scales.y.suggestedMax * 0.7355;
+  Courbes.options.scales.y1.max =
+    Courbes.options.scales.y.suggestedMax * 0.7355;
   Courbes.update();
   createTable();
 }
@@ -60,7 +63,8 @@ function resetValues() {
   Courbes.data.datasets[0].data = values;
   Courbes.data.datasets[1].data = valuesKW;
   Courbes.options.scales.y.suggestedMax = Math.max(...values) * 1.1;
-  Courbes.options.scales.y1.max = Courbes.options.scales.y.suggestedMax * 0.7355;
+  Courbes.options.scales.y1.max =
+    Courbes.options.scales.y.suggestedMax * 0.7355;
   Courbes.update();
   createTable();
 }
@@ -79,7 +83,8 @@ function smoothCurve() {
   Courbes.data.datasets[0].data = values;
   Courbes.data.datasets[1].data = valuesKW;
   Courbes.options.scales.y.suggestedMax = Math.max(...values) * 1.1;
-  Courbes.options.scales.y1.max = Courbes.options.scales.y.suggestedMax * 0.7355;
+  Courbes.options.scales.y1.max =
+    Courbes.options.scales.y.suggestedMax * 0.7355;
   Courbes.update();
   createTable();
 }
@@ -170,7 +175,6 @@ let Courbes = new Chart(ctx, {
     },
   },
 });
-
 createSliders();
 createTable();
 
@@ -202,3 +206,58 @@ function scrollToSlider(input) {
     setTimeout(() => (firstMatch.style.boxShadow = ""), 1000);
   }
 }
+function importValues() {
+  const input = document.getElementById("import-input").value.trim();
+  const lines = input.split("\n");
+
+  let newLabels = [];
+  let newValuesKW = [];
+
+  for (let line of lines) {
+    const parts = line.split("|").map((p) => p.trim());
+    if (parts.length !== 2) continue;
+
+    const rpm = parseInt(parts[0]);
+    const kW = parseFloat(parts[1]);
+
+    if (!isNaN(rpm) && !isNaN(kW)) {
+      newLabels.push(rpm);
+      newValuesKW.push(kW);
+    }
+  }
+
+  if (newLabels.length === 0) {
+    alert("Aucune donnée valide détectée. Format attendu : 1500 | 150");
+    return;
+  }
+
+  // Met à jour les données globales
+  labels = newLabels;
+  valuesKW = newValuesKW;
+  values = newValuesKW.map((kW) => Math.round(kW / 0.7355));
+
+  // Recharge tous les éléments
+  createSliders();
+  createTable();
+
+  Courbes.data.labels = labels;
+  Courbes.data.datasets[0].data = values;
+  Courbes.data.datasets[1].data = valuesKW;
+  Courbes.options.scales.y.suggestedMax = Math.max(...values) * 1.1;
+  Courbes.options.scales.y1.max =
+    Courbes.options.scales.y.suggestedMax * 0.7355;
+  Courbes.update();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
