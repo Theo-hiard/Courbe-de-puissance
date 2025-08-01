@@ -248,16 +248,3 @@ function importValues() {
     Courbes.options.scales.y.suggestedMax * 0.7355;
   Courbes.update();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
